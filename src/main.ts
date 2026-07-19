@@ -1,19 +1,19 @@
-const BIRD_COUNT = 4;
+const BIRD_COUNT = 10;
 const BIRD_WALL_MARGIN = 10;
 const BIRD_WALL_WEIGHT = 0.8;
 
 const Settings = {
-    bird_size: 12,
-    bird_speed: 6,
+    bird_size: 6,
+    bird_speed: 2,
 
-    bird_vision: 100,
-    bird_separation: 60,
+    bird_vision: 50,
+    bird_separation: 40,
 
-    bird_alignment_weight: 1,
+    bird_alignment_weight: 2,
     bird_cohesion_weight: 1,
-    bird_separation_weight: 4,
+    bird_separation_weight: 10,
 
-    line_thickness: 2,
+    line_thickness: 1,
 }
 
 const BIRD_COLOR = [
@@ -66,8 +66,12 @@ class Bird {
 
         ctx.closePath();
 
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = BACKGROUND_COLOR;
         ctx.fill();
+
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
         ctx.restore();
 
@@ -276,7 +280,6 @@ function loop(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, flock: B
         bird.draw(ctx);
     }
 
-
     requestAnimationFrame(() => loop(canvas, ctx, flock));
 }
 
@@ -315,7 +318,7 @@ function main() {
     });
 
     window.addEventListener("click", (event) => {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < BIRD_COUNT; i++) {
             flock.push(new Bird(event.clientX,
                 event.clientY,
                 Math.random() * Math.PI * 2,
@@ -323,9 +326,6 @@ function main() {
             ));
         }
     })
-
-    // ctx.filter = 'blur(8px) contrast(150%)';
-    // ctx.globalCompositeOperation = 'screen';
 
     const settings_toggle = document.getElementById('settings-toggle');
     const settings_panel = document.getElementById('settings-panel');
@@ -366,9 +366,9 @@ function main() {
     bird_speed.value = String(Settings.bird_speed);
     bird_vision.value = String(Settings.bird_vision);
     bird_separation.value = String(Settings.bird_separation);
-    bird_alignment_weight.value = String(Settings.bird_alignment_weight / 10);
-    bird_cohesion_weight.value = String(Settings.bird_cohesion_weight / 1000);
-    bird_separation_weight.value = String(Settings.bird_separation_weight / 10);
+    bird_alignment_weight.value = String(Settings.bird_alignment_weight);
+    bird_cohesion_weight.value = String(Settings.bird_cohesion_weight);
+    bird_separation_weight.value = String(Settings.bird_separation_weight);
     line_thickness.value = String(Settings.line_thickness);
 
     bird_size.addEventListener("input", () => {

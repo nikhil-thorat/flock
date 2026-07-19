@@ -1,14 +1,20 @@
-const BIRD_SIZE = 12;
 const BIRD_COUNT = 4;
-const BIRD_SPEED = 6.0;
-
-const BIRD_VISION = 100;
-const BIRD_SEPARATION = 60;
-const BIRD_ALIGNMENT_WEIGHT = 0.1;
-const BIRD_COHESION_WEIGHT = 0.001;
-const BIRD_SEPARATION_WEIGHT = 4.0;
 const BIRD_WALL_MARGIN = 10;
 const BIRD_WALL_WEIGHT = 0.8;
+
+const Settings = {
+    bird_size: 12,
+    bird_speed: 6,
+
+    bird_vision: 100,
+    bird_separation: 60,
+
+    bird_alignment_weight: 1,
+    bird_cohesion_weight: 1,
+    bird_separation_weight: 4,
+
+    line_thickness: 2,
+}
 
 const BIRD_COLOR = [
     "#FFADAD",
@@ -26,8 +32,6 @@ const BIRD_COLOR = [
 ];
 const BACKGROUND_COLOR = "#222";
 const LINE_COLOR = "gray";
-
-const ENABLE_LINES = false;
 
 let running = true;
 
@@ -55,10 +59,10 @@ class Bird {
         ctx.rotate(Math.atan2(this.vy, this.vx))
 
         ctx.beginPath();
-        ctx.moveTo(BIRD_SIZE + 2, 0);
+        ctx.moveTo(Settings.bird_size + 2, 0);
 
-        ctx.lineTo(-BIRD_SIZE, -BIRD_SIZE);
-        ctx.lineTo(-BIRD_SIZE, BIRD_SIZE);
+        ctx.lineTo(-Settings.bird_size, -Settings.bird_size);
+        ctx.lineTo(-Settings.bird_size, Settings.bird_size);
 
         ctx.closePath();
 
@@ -115,8 +119,8 @@ class Bird {
         const steerX = averageVX - this.vx;
         const steerY = averageVY - this.vy;
 
-        this.vx += steerX * BIRD_ALIGNMENT_WEIGHT;
-        this.vy += steerY * BIRD_ALIGNMENT_WEIGHT;
+        this.vx += steerX * (Settings.bird_alignment_weight / 10);
+        this.vy += steerY * (Settings.bird_alignment_weight / 10);
     }
 
 
@@ -127,8 +131,8 @@ class Bird {
             return;
         }
 
-        this.vx = (this.vx / length) * BIRD_SPEED;
-        this.vy = (this.vy / length) * BIRD_SPEED;
+        this.vx = (this.vx / length) * Settings.bird_speed;
+        this.vy = (this.vy / length) * Settings.bird_speed;
     }
 
     public move(): void {
@@ -156,8 +160,8 @@ class Bird {
         const desired_x = center_x - this.x;
         const desired_y = center_y - this.y;
 
-        this.vx += desired_x * BIRD_COHESION_WEIGHT;
-        this.vy += desired_y * BIRD_COHESION_WEIGHT;
+        this.vx += desired_x * (Settings.bird_cohesion_weight / 1000);
+        this.vy += desired_y * (Settings.bird_cohesion_weight / 1000);
     }
 
     private separation(neighbors: Bird[]) {
@@ -165,7 +169,7 @@ class Bird {
         let steer_x = 0;
         let steer_y = 0;
 
-        const seperation_radius_squared = BIRD_SEPARATION * BIRD_SEPARATION;
+        const seperation_radius_squared = Settings.bird_separation * Settings.bird_separation;
 
         for (const bird of neighbors) {
             if (bird === this) {
@@ -185,13 +189,13 @@ class Bird {
             steer_y += dy / distance_squared;
         }
 
-        this.vx += steer_x * BIRD_SEPARATION_WEIGHT;
-        this.vy += steer_y * BIRD_SEPARATION_WEIGHT;
+        this.vx += steer_x * (Settings.bird_separation_weight / 10);
+        this.vy += steer_y * (Settings.bird_separation_weight / 10);
 
     }
 
     private avoid_wall(canvas: HTMLCanvasElement): void {
-        const margin = BIRD_WALL_MARGIN + BIRD_SIZE;
+        const margin = BIRD_WALL_MARGIN + Settings.bird_size;
 
         if (this.x < margin && this.vx < 0) {
             const strength = (margin - this.x) / margin;
@@ -226,10 +230,11 @@ class Bird {
 
                 const distance = (dx * dx) + (dy * dy);
 
-                if (distance <= Math.pow(BIRD_VISION, 2)) {
+                if (distance <= Math.pow(Settings.bird_vision, 2)) {
                     ctx.beginPath();
                     ctx.moveTo(a.x, a.y);
                     ctx.lineTo(b.x, b.y);
+                    ctx.lineWidth = Settings.line_thickness;
                     ctx.strokeStyle = LINE_COLOR;
                     ctx.stroke();
                 }
@@ -240,7 +245,7 @@ class Bird {
 
     public update(flock: Bird[], canvas: HTMLCanvasElement) {
 
-        const neighbors = this.find_neighbors(flock, BIRD_VISION);
+        const neighbors = this.find_neighbors(flock, Settings.bird_vision);
 
         this.align(neighbors);
         this.cohesion(neighbors);
@@ -263,7 +268,7 @@ function loop(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, flock: B
             bird.update(flock, canvas);
     }
 
-    if (ENABLE_LINES)
+    if (Settings.line_thickness != 0)
         Bird.lines(flock, ctx);
 
 
@@ -321,6 +326,98 @@ function main() {
 
     // ctx.filter = 'blur(8px) contrast(150%)';
     // ctx.globalCompositeOperation = 'screen';
+
+    const settings_toggle = document.getElementById('settings-toggle');
+    const settings_panel = document.getElementById('settings-panel');
+
+    if (!settings_panel || !settings_toggle) {
+        return;
+    }
+
+    settings_toggle.addEventListener('click', () => {
+        settings_panel.classList.toggle('hidden');
+    })
+
+    const bird_size = document.getElementById('size') as HTMLInputElement;
+    const bird_speed = document.getElementById('speed') as HTMLInputElement;
+
+    const bird_vision = document.getElementById('vision') as HTMLInputElement;
+    const bird_separation = document.getElementById('separation') as HTMLInputElement;
+
+    const bird_alignment_weight = document.getElementById('alignment_weight') as HTMLInputElement;
+    const bird_cohesion_weight = document.getElementById('cohesion_weight') as HTMLInputElement;
+    const bird_separation_weight = document.getElementById('separation_weight') as HTMLInputElement;
+
+    const line_thickness = document.getElementById('lines') as HTMLInputElement;
+
+    if (!bird_size ||
+        !bird_speed ||
+        !bird_vision ||
+        !bird_separation ||
+        !bird_alignment_weight ||
+        !bird_cohesion_weight ||
+        !bird_separation_weight ||
+        !line_thickness
+    ) {
+        return;
+    }
+
+    bird_size.value = String(Settings.bird_size);
+    bird_speed.value = String(Settings.bird_speed);
+    bird_vision.value = String(Settings.bird_vision);
+    bird_separation.value = String(Settings.bird_separation);
+    bird_alignment_weight.value = String(Settings.bird_alignment_weight / 10);
+    bird_cohesion_weight.value = String(Settings.bird_cohesion_weight / 1000);
+    bird_separation_weight.value = String(Settings.bird_separation_weight / 10);
+    line_thickness.value = String(Settings.line_thickness);
+
+    bird_size.addEventListener("input", () => {
+        Settings.bird_size = Number(bird_size.value);
+        const value = bird_size.nextElementSibling!;
+        value.textContent = bird_size.value;
+    })
+
+    bird_speed.addEventListener("input", () => {
+        Settings.bird_speed = Number(bird_speed.value);
+        const value = bird_speed.nextElementSibling!;
+        value.textContent = bird_speed.value;
+    })
+
+    bird_vision.addEventListener("input", () => {
+        Settings.bird_vision = Number(bird_vision.value);
+        const value = bird_vision.nextElementSibling!;
+        value.textContent = bird_vision.value;
+    })
+
+    bird_separation.addEventListener("input", () => {
+        Settings.bird_separation = Number(bird_separation.value);
+        const value = bird_separation.nextElementSibling!;
+        value.textContent = bird_separation.value;
+    })
+
+    bird_alignment_weight.addEventListener("input", () => {
+        Settings.bird_alignment_weight = Number(bird_alignment_weight.value);
+        const value = bird_alignment_weight.nextElementSibling!;
+        value.textContent = bird_alignment_weight.value;
+    })
+
+    bird_cohesion_weight.addEventListener("input", () => {
+        Settings.bird_cohesion_weight = Number(bird_cohesion_weight.value);
+        const value = bird_cohesion_weight.nextElementSibling!;
+        value.textContent = bird_cohesion_weight.value;
+    })
+
+    bird_separation_weight.addEventListener("input", () => {
+        Settings.bird_separation_weight = Number(bird_separation_weight.value);
+        const value = bird_separation_weight.nextElementSibling!;
+        value.textContent = bird_separation_weight.value;
+    })
+
+    line_thickness.addEventListener('click', () => {
+        Settings.line_thickness = Number(line_thickness.value);
+        const value = line_thickness.nextElementSibling!;
+        value.textContent = line_thickness.value;
+    })
 
     loop(canvas, ctx, flock);
 

@@ -8,7 +8,100 @@
     <title>flock</title>
   </head>
   <body>
-    <canvas id="canvas"></div>
+    <canvas id="canvas"></canvas>
+    <button id="settings-toggle">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-icon lucide-settings"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+</button>
+    <div id="settings-panel" class="hidden">
+        <label>
+            Bird Size
+            <input
+                    id="size"
+                    type="range"
+                    min="1"
+                    max="12"
+                    value="8"
+                    step="1"
+            />
+        </label>
+        <label>
+            Bird Speed
+            <input
+                    id="speed"
+                    type="range"
+                    min="2"
+                    max="16"
+                    value="4"
+                    step="1"
+            />
+        </label>
+        <label>
+            Bird Vision
+            <input
+                    id="vision"
+                    type="range"
+                    min="20"
+                    max="200"
+                    value="60"
+                    step="10"
+            />
+        </label>
+        <label>
+            Bird Separation
+            <input
+                    id="separation"
+                    type="range"
+                    min="50"
+                    max="150"
+                    value="60"
+                    step="10"
+            />
+        </label>
+        <label>
+            Bird Alignment Weight
+            <input
+                    id="alignment_weight"
+                    type="range"
+                    min="0"
+                    max="10"
+                    value="1"
+                    step="1"
+            />
+        </label>
+        <label>
+            Bird Cohesion Weight
+            <input
+                    id="cohesion_weight"
+                    type="range"
+                    min="0"
+                    max="10"
+                    value="1"
+                    step="1"
+            />
+        </label>
+        <label>
+            Bird Separation Weight
+            <input
+                    id="separation_weight"
+                    type="range"
+                    min="0"
+                    max="10"
+                    value="4"
+                    step="1"
+            />
+        </label>
+        <label>
+            Line Thickness
+            <input
+                    id="lines"
+                    type="range"
+                    min="0"
+                    max="8"
+                    value="2"
+                    step="1"
+            />
+        </label>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -317,7 +317,7 @@ function main() {
         }
     });
 
-    window.addEventListener("click", (event) => {
+    canvas.addEventListener("click", (event) => {
         for (let i = 0; i < BIRD_COUNT; i++) {
             flock.push(new Bird(event.clientX,
                 event.clientY,
